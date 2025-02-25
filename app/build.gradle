@@ -48,4 +48,7 @@ dependencies {
     // Coroutines for async operations
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    
+    // Add the official Google AI SDK
+    implementation 'com.google.ai.client.generativeai:generativeai:0.1.1'
 } 

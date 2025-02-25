@@ -64,8 +64,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupChatbot() {
         findViewById<FloatingActionButton>(R.id.chatbotFab).setOnClickListener {
-            Toast.makeText(this, "AI Assistant Coming Soon", Toast.LENGTH_SHORT).show()
-            // Launch chatbot activity
+            startActivity(Intent(this, ChatbotActivity::class.java))
         }
     }
 } 

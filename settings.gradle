@@ -10,6 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://google.generativeai.artifactory.dev/artifactory/generativeai-java-local/' }
     }
 }
 
