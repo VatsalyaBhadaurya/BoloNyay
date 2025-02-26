@@ -16,6 +16,7 @@ import android.widget.Spinner
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.example.legalapp.utils.SessionManager
+import android.widget.ImageView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
@@ -47,6 +48,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<CardView>(R.id.criminalCard).setOnClickListener {
             Toast.makeText(this, "Criminal Cases Selected", Toast.LENGTH_SHORT).show()
+        }
+
+        findViewById<ImageView>(R.id.bhashiniLogo).setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
         }
     }
 

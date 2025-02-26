@@ -40,6 +40,9 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"/>
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>

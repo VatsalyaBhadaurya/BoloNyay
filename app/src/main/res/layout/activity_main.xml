@@ -266,11 +266,15 @@
 
                 <!-- Bhashini Logo at bottom -->
                 <ImageView
+                    android:id="@+id/bhashiniLogo"
                     android:layout_width="120dp"
                     android:layout_height="120dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="32dp"
                     android:src="@drawable/bha"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
                     android:contentDescription="Bhashini Logo"/>
 
             </LinearLayout>
