@@ -1,5 +1,6 @@
 package com.example.legalapp.adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.legalapp.R
 import com.example.legalapp.models.LegalCase
+import com.example.legalapp.NewApplicationActivity
 
 class LegalCaseAdapter : ListAdapter<LegalCase, LegalCaseAdapter.LegalCaseViewHolder>(DIFF_CALLBACK) {
 
@@ -31,8 +33,18 @@ class LegalCaseAdapter : ListAdapter<LegalCase, LegalCaseAdapter.LegalCaseViewHo
         fun bind(legalCase: LegalCase) {
             caseNumberText.text = legalCase.caseNumber
             titleText.text = legalCase.title
-            courtText.text = legalCase.court
-            statusText.text = legalCase.status
+            courtText.text = "Authority: ${legalCase.court}"
+            statusText.text = "Required Documents Listed Below"
+
+            itemView.setOnClickListener {
+                val context = itemView.context
+                val intent = Intent(context, NewApplicationActivity::class.java).apply {
+                    putExtra("form_type", legalCase.caseNumber)
+                    putExtra("form_title", legalCase.title)
+                    putExtra("form_description", legalCase.description)
+                }
+                context.startActivity(intent)
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.legalapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -18,60 +19,96 @@ class SearchResultsActivity : AppCompatActivity() {
     private lateinit var adapter: LegalCaseAdapter
 
     // Sample data - simulating a database of cases
-    private val allCases = listOf(
+    private val allApplications = listOf(
         LegalCase(
-            "WP(C) 12345/2023",
-            "Environmental Protection PIL",
-            "High Court of Delhi",
-            "Civil",
-            "2023-12-01",
-            "Pending",
-            "PIL regarding air pollution in Delhi NCR"
+            "RTI-FORM",
+            "Right to Information (RTI) Application Form",
+            "Information Commission",
+            "Public Information",
+            "Standard Form",
+            "Ready to Fill",
+            "File RTI application to any government department. Required documents: ID proof, Address proof"
         ),
         LegalCase(
-            "CRL.A. 567/2023",
-            "State vs Kumar Criminal Appeal",
-            "Supreme Court of India",
-            "Criminal",
-            "2023-11-15",
-            "Active",
-            "Criminal appeal against High Court judgment"
+            "DIV-FORM",
+            "Mutual Consent Divorce Application",
+            "Family Court",
+            "Family Law",
+            "Form 1",
+            "Ready to Fill",
+            "Application for divorce by mutual consent. Required: Marriage certificate, Photos, Address proof"
         ),
         LegalCase(
-            "CS(COMM) 789/2023",
-            "Property Dispute Case",
-            "District Court, Mumbai",
-            "Civil",
-            "2023-10-20",
-            "Under Review",
-            "Commercial property dispute in Mumbai"
+            "DV-FORM",
+            "Domestic Violence Complaint Form",
+            "Magistrate Court",
+            "Protection Law",
+            "Form DIR-I",
+            "Ready to Fill",
+            "File domestic violence complaint. Required: ID proof, Incident details, Address proof"
         ),
         LegalCase(
-            "WP(C) 234/2023",
-            "Right to Education PIL",
-            "High Court of Karnataka",
-            "Civil",
-            "2023-09-05",
-            "Disposed",
-            "PIL regarding implementation of RTE Act"
+            "MARRIAGE-FORM",
+            "Marriage Registration Application",
+            "Marriage Registrar",
+            "Family Law",
+            "Form II",
+            "Ready to Fill",
+            "Register your marriage. Required: Age proof, Photos, Witness details, Address proof"
         ),
         LegalCase(
-            "CWP 890/2023",
-            "Labor Rights Petition",
-            "High Court of Punjab & Haryana",
-            "Civil",
-            "2023-08-15",
-            "Pending",
-            "Petition regarding factory workers' rights"
+            "TENANT-FORM",
+            "Tenant Registration Form",
+            "Housing Authority",
+            "Property Law",
+            "Form C",
+            "Ready to Fill",
+            "Register tenant agreement. Required: Property papers, ID proofs of both parties"
         ),
         LegalCase(
-            "SLP(Crl) 456/2023",
-            "Special Leave Petition",
-            "Supreme Court of India",
-            "Criminal",
-            "2023-07-30",
-            "Listed",
-            "Special leave to appeal against HC order"
+            "CONSUMER-FORM",
+            "Consumer Complaint Form",
+            "Consumer Forum",
+            "Consumer Law",
+            "Form A",
+            "Ready to Fill",
+            "File consumer complaint. Required: Purchase bill, Correspondence with seller"
+        ),
+        LegalCase(
+            "MAINTENANCE-FORM",
+            "Maintenance Application Form",
+            "Family Court",
+            "Family Law",
+            "Form III",
+            "Ready to Fill",
+            "Apply for maintenance under Section 125 CrPC. Required: Marriage proof, Income details"
+        ),
+        LegalCase(
+            "FIR-FORM",
+            "First Information Report (FIR)",
+            "Police Station",
+            "Criminal Law",
+            "Standard Form",
+            "Ready to Fill",
+            "File police complaint. Required: ID proof, Incident details"
+        ),
+        LegalCase(
+            "WILL-FORM",
+            "Will Registration Form",
+            "Sub-Registrar Office",
+            "Property Law",
+            "Form W",
+            "Ready to Fill",
+            "Register your will. Required: Property details, Witness details, ID proof"
+        ),
+        LegalCase(
+            "LABOUR-FORM",
+            "Labour Complaint Form",
+            "Labour Commissioner",
+            "Labour Law",
+            "Form B",
+            "Ready to Fill",
+            "File workplace complaint. Required: Employment proof, Complaint details"
         )
     )
 
@@ -104,19 +141,22 @@ class SearchResultsActivity : AppCompatActivity() {
                 // Simulate network delay
                 kotlinx.coroutines.delay(1000)
 
-                // Filter cases based on search query
-                val results = allCases.filter { case ->
-                    case.title.contains(query, ignoreCase = true) ||
-                    case.caseNumber.contains(query, ignoreCase = true) ||
-                    case.court.contains(query, ignoreCase = true) ||
-                    case.description.contains(query, ignoreCase = true) ||
-                    case.category.contains(query, ignoreCase = true)
+                // Filter applications based on search query
+                val results = allApplications.filter { application ->
+                    val searchTerms = query.lowercase().split(" ")
+                    searchTerms.any { term ->
+                        application.title.lowercase().contains(term) ||
+                        application.description.lowercase().contains(term) ||
+                        application.category.lowercase().contains(term)
+                    }
+                }.sortedBy { application -> 
+                    if (application.title.lowercase().contains(query.lowercase())) 0 else 1
                 }
                 
                 progressBar.visibility = View.GONE
                 if (results.isEmpty()) {
                     noResultsText.visibility = View.VISIBLE
-                    noResultsText.text = "No cases found matching '$query'"
+                    noResultsText.text = "No application forms found matching '$query'\nTry searching with different keywords"
                 } else {
                     adapter.submitList(results)
                 }
