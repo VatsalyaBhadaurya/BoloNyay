@@ -29,6 +29,8 @@ import android.widget.Toast
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ProgressBar
+import com.google.android.material.textfield.TextInputLayout
+import android.widget.LinearLayout
 
 class NewApplicationActivity : AppCompatActivity() {
     private lateinit var micButton: FloatingActionButton
@@ -41,22 +43,48 @@ class NewApplicationActivity : AppCompatActivity() {
     private lateinit var speechRecognizer: SpeechRecognizer
     private var isRecording = false
     private var currentEditText: EditText? = null
+    private var formContainer: LinearLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         try {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_new_application)
 
+            // Initialize views
+            formContainer = findViewById(R.id.formContainer)
+            micButton = findViewById(R.id.micButton)
+            recordingStatus = findViewById(R.id.recordingStatus)
+            nameInput = findViewById(R.id.nameInput)
+            descriptionInput = findViewById(R.id.descriptionInput)
+            reliefInput = findViewById(R.id.reliefInput)
+            progressBar = findViewById(R.id.progressBar)
             sessionManager = SessionManager(this)
-            setupViews()
+
+            // Get form type from intent
+            val formType = intent.getStringExtra("FORM_TYPE") ?: "GENERAL"
+            val formTitle = intent.getStringExtra("FORM_TITLE") ?: "New Application"
+
+            // Set up toolbar
+            val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+            setSupportActionBar(toolbar)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setDisplayShowTitleEnabled(false)
+
+            // Set the title
+            findViewById<TextView>(R.id.titleText)?.text = formTitle
+
+            // Setup form fields based on type
+            setupFormFields(formType)
+
+            // Setup other functionality
             setupSpeechRecognition()
             checkPermissions()
-            setupFormBasedOnType()
             setupVoiceInputButtons()
             setupSubmitButton()
+
         } catch (e: Exception) {
             Log.e("NewApplicationActivity", "Error in onCreate: ${e.message}", e)
-            Toast.makeText(this, "Error initializing application", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Error initializing form: ${e.message}", Toast.LENGTH_LONG).show()
             finish()
         }
     }
@@ -216,7 +244,7 @@ class NewApplicationActivity : AppCompatActivity() {
             val formDescription = intent.getStringExtra("form_description") ?: return
 
             // Update the title
-            findViewById<TextView>(R.id.toolbarTitle)?.text = formTitle
+            findViewById<TextView>(R.id.titleText)?.text = formTitle
 
             // Pre-fill form fields based on type
             when (formType) {
@@ -236,7 +264,6 @@ class NewApplicationActivity : AppCompatActivity() {
             descriptionInput.hint = "Details (Required: ${formDescription})"
         } catch (e: Exception) {
             Log.e("NewApplicationActivity", "Error in setupFormBasedOnType: ${e.message}", e)
-            // Don't finish the activity, just show an error message
             Toast.makeText(this, "Error setting up form", Toast.LENGTH_SHORT).show()
         }
     }
@@ -462,4 +489,99 @@ class NewApplicationActivity : AppCompatActivity() {
         val description: String,
         val relief: String
     )
+
+    private fun setupFormFields(formType: String) {
+        try {
+            // Clear existing fields first
+            formContainer?.removeAllViews()
+
+            // Add form fields based on type
+            when (formType) {
+                "RTI" -> {
+                    addField("Department/Organization Name")
+                    addField("Information Required")
+                    addField("Time Period")
+                    addField("Purpose")
+                }
+                "DIVORCE" -> {
+                    addField("Spouse Name")
+                    addField("Marriage Date")
+                    addField("Reason for Divorce")
+                    addField("Marriage Registration Number")
+                }
+                "FIR" -> {
+                    addField("Incident Date")
+                    addField("Incident Location")
+                    addField("Description of Incident")
+                    addField("Accused Details (if known)")
+                }
+                "PROPERTY" -> {
+                    addField("Property Address")
+                    addField("Property Type")
+                    addField("Dispute Description")
+                    addField("Other Party Details")
+                }
+                "CIVIL" -> {
+                    addField("Case Title")
+                    addField("Parties Involved")
+                    addField("Case Description")
+                    addField("Relief Sought")
+                }
+                "CRIMINAL" -> {
+                    addField("Nature of Complaint")
+                    addField("Incident Details")
+                    addField("Accused Information")
+                    addField("Witnesses (if any)")
+                }
+                else -> {
+                    // Default fields
+                    addField("Application Title")
+                    addField("Description")
+                    addField("Supporting Documents")
+                }
+            }
+
+            // Add common fields at the bottom
+            addField("Additional Comments")
+            addField("Contact Information")
+
+        } catch (e: Exception) {
+            Log.e("NewApplicationActivity", "Error in setupFormFields: ${e.message}", e)
+            Toast.makeText(this, "Error setting up form fields", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun addField(hint: String) {
+        try {
+            val textInputLayout = TextInputLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 16, 0, 16)
+                }
+                boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
+            }
+
+            val editText = TextInputEditText(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                this.hint = hint
+            }
+
+            textInputLayout.addView(editText)
+            formContainer?.addView(textInputLayout)
+
+        } catch (e: Exception) {
+            Log.e("NewApplicationActivity", "Error adding field: ${e.message}", e)
+        }
+    }
+
+    // Add this to handle back button in toolbar
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
 } 

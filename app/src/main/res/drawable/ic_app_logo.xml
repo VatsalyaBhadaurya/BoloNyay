@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background Circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,0A54,54 0 1,1 54,108A54,54 0 1,1 54,0"/>
+
+    <!-- Saffron Band -->
+    <path
+        android:fillColor="#FF9933"
+        android:pathData="M20,30h68v16h-68z"/>
+
+    <!-- White Band with Ashoka Chakra -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M20,46h68v16h-68z"/>
+
+    <!-- Ashoka Chakra -->
+    <path
+        android:fillColor="#000080"
+        android:pathData="M54,54m-8,0a8,8 0 1,1 16,0a8,8 0 1,1 -16,0"/>
+    
+    <!-- 24 spokes of the Chakra -->
+    <path
+        android:strokeColor="#000080"
+        android:strokeWidth="1"
+        android:pathData="M54,54 l0,-8 M54,54 l5.66,-5.66 M54,54 l8,0 M54,54 l5.66,5.66
+                         M54,54 l0,8 M54,54 l-5.66,5.66 M54,54 l-8,0 M54,54 l-5.66,-5.66
+                         M54,54 l2.83,-7.66 M54,54 l7.66,-2.83 M54,54 l7.66,2.83 M54,54 l2.83,7.66
+                         M54,54 l-2.83,7.66 M54,54 l-7.66,2.83 M54,54 l-7.66,-2.83 M54,54 l-2.83,-7.66"/>
+
+    <!-- Green Band -->
+    <path
+        android:fillColor="#138808"
+        android:pathData="M20,62h68v16h-68z"/>
+
+    <!-- Border -->
+    <path
+        android:strokeColor="#E0E0E0"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M54,2A52,52 0 1,1 54,106A52,52 0 1,1 54,2"/>
+</vector> 

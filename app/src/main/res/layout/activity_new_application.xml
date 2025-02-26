@@ -14,13 +14,14 @@
         android:elevation="4dp">
 
         <TextView
-            android:id="@+id/toolbarTitle"
+            android:id="@+id/titleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/new_application"
+            android:text="New Application"
             android:textColor="@color/text_white"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"/>
+
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
@@ -30,6 +31,7 @@
         android:fillViewport="true">
 
         <LinearLayout
+            android:id="@+id/formContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

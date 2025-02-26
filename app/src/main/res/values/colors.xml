@@ -1,32 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Primary Colors -->
-    <color name="primary">#2C3E50</color>
-    <color name="primary_dark">#1B2631</color>
-    <color name="primary_light">#3D5166</color>
-
+    <color name="primary">#0c3aa9</color>
+    <color name="primary_dark">#092b7d</color>
+    <color name="primary_light">#4c6bc5</color>
+    
     <!-- Secondary Colors -->
-    <color name="secondary_orange">#E67E22</color>
-    <color name="secondary_green">#27AE60</color>
+    <color name="secondary_orange">#e76221</color>
+    <color name="secondary_green">#009845</color>
+    <color name="accent_blue">#0c3aa9</color>
 
     <!-- Background Colors -->
     <color name="background">#FFFFFF</color>
-    <color name="background_light">#F4F4F4</color>
+    <color name="background_light">#F5F6FA</color>
+    <color name="card_background">#FFFFFF</color>
     
     <!-- Text Colors -->
-    <color name="text_primary">#34495E</color>
+    <color name="text_primary">#2C3E50</color>
     <color name="text_secondary">#7F8C8D</color>
     <color name="text_white">#FFFFFF</color>
 
-    <!-- Accent Colors -->
-    <color name="error">#C0392B</color>
+    <!-- Status Colors -->
+    <color name="status_pending">#e76221</color>
+    <color name="status_progress">#0c3aa9</color>
+    <color name="status_completed">#009845</color>
+    <color name="status_error">#E74C3C</color>
+
+    <!-- Action Colors -->
+    <color name="error">#E74C3C</color>
     <color name="warning">#F1C40F</color>
+    <color name="success">#2ECC71</color>
 
     <!-- Status Bar and Navigation Colors -->
-    <color name="status_bar">#1B2631</color>
-    <color name="nav_bar">#2C3E50</color>
+    <color name="status_bar">#092b7d</color>
+    <color name="nav_bar">#0c3aa9</color>
 
-    <!-- Legacy Colors (Required by Android) -->
+    <!-- Legacy Colors -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>
