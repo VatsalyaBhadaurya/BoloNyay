@@ -54,9 +54,6 @@ class NewApplicationActivity : AppCompatActivity() {
             formContainer = findViewById(R.id.formContainer)
             micButton = findViewById(R.id.micButton)
             recordingStatus = findViewById(R.id.recordingStatus)
-            nameInput = findViewById(R.id.nameInput)
-            descriptionInput = findViewById(R.id.descriptionInput)
-            reliefInput = findViewById(R.id.reliefInput)
             progressBar = findViewById(R.id.progressBar)
             sessionManager = SessionManager(this)
 
@@ -79,8 +76,6 @@ class NewApplicationActivity : AppCompatActivity() {
             // Setup other functionality
             setupSpeechRecognition()
             checkPermissions()
-            setupVoiceInputButtons()
-            setupSubmitButton()
 
         } catch (e: Exception) {
             Log.e("NewApplicationActivity", "Error in onCreate: ${e.message}", e)
@@ -413,23 +408,6 @@ class NewApplicationActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun setupVoiceInputButtons() {
-        // Setup voice input for each field
-        setupVoiceInputForField(R.id.nameInput, R.id.nameVoiceButton)
-        setupVoiceInputForField(R.id.descriptionInput, R.id.descriptionVoiceButton)
-        setupVoiceInputForField(R.id.reliefInput, R.id.reliefVoiceButton)
-    }
-
-    private fun setupVoiceInputForField(editTextId: Int, buttonId: Int) {
-        val editText = findViewById<EditText>(editTextId)
-        val voiceButton = findViewById<ImageButton>(buttonId)
-        
-        voiceButton.setOnClickListener {
-            currentEditText = editText
-            startVoiceRecognition()
-        }
-    }
-
     private fun startVoiceRecognition() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -541,9 +519,12 @@ class NewApplicationActivity : AppCompatActivity() {
                 }
             }
 
-            // Add common fields at the bottom
+            // Add common fields
             addField("Additional Comments")
             addField("Contact Information")
+
+            // Add submit button at the bottom
+            addSubmitButton()
 
         } catch (e: Exception) {
             Log.e("NewApplicationActivity", "Error in setupFormFields: ${e.message}", e)
@@ -553,12 +534,24 @@ class NewApplicationActivity : AppCompatActivity() {
 
     private fun addField(hint: String) {
         try {
-            val textInputLayout = TextInputLayout(this).apply {
+            // Create horizontal layout
+            val horizontalLayout = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, 8, 0, 8)
+            }
+
+            // Create TextInputLayout with EditText
+            val textInputLayout = TextInputLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    0,  // width will be determined by weight
+                    LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(0, 16, 0, 16)
+                    weight = 1f  // takes up remaining space
+                    marginEnd = 8
                 }
                 boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
             }
@@ -569,13 +562,67 @@ class NewApplicationActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
                 this.hint = hint
+                setPadding(16, 16, 16, 16)
             }
 
+            // Create voice input button
+            val voiceButton = ImageButton(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    48,  // fixed width
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                ).apply {
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                }
+                setImageResource(R.drawable.ic_mic)  // make sure you have this drawable
+                background = null  // removes button background
+                setColorFilter(ContextCompat.getColor(context, R.color.primary))
+                contentDescription = "Voice input for $hint"
+                
+                setOnClickListener {
+                    currentEditText = editText
+                    startVoiceRecognition()
+                }
+            }
+
+            // Add views to their containers
             textInputLayout.addView(editText)
-            formContainer?.addView(textInputLayout)
+            horizontalLayout.addView(textInputLayout)
+            horizontalLayout.addView(voiceButton)
+            formContainer?.addView(horizontalLayout)
 
         } catch (e: Exception) {
             Log.e("NewApplicationActivity", "Error adding field: ${e.message}", e)
+        }
+    }
+
+    private fun addSubmitButton() {
+        try {
+            // Create submit button
+            val submitButton = MaterialButton(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(16, 32, 16, 16)
+                }
+                text = "Submit Application"
+                setBackgroundColor(ContextCompat.getColor(context, R.color.secondary_green))
+                setTextColor(ContextCompat.getColor(context, R.color.text_white))
+                cornerRadius = resources.getDimensionPixelSize(R.dimen.button_corner_radius)
+                elevation = resources.getDimensionPixelSize(R.dimen.button_elevation).toFloat()
+                
+                setOnClickListener {
+                    if (validateForm()) {
+                        submitForm()
+                    }
+                }
+            }
+
+            // Add button to form container
+            formContainer?.addView(submitButton)
+
+        } catch (e: Exception) {
+            Log.e("NewApplicationActivity", "Error adding submit button: ${e.message}", e)
         }
     }
 

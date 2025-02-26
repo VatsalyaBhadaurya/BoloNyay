@@ -34,42 +34,38 @@
                     android:padding="2dp"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="16dp"
                     android:text="@string/app_name"
                     android:textColor="@color/text_white"
                     android:textSize="20sp"
                     android:fontFamily="sans-serif-medium"/>
+
+                <Spinner
+                    android:id="@+id/languageSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:background="@null"
+                    android:minWidth="100dp"/>
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
-
-        <!-- Language Selection -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/background"
-            android:padding="16dp">
-
-            <Spinner
-                android:id="@+id/languageSpinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
 
         <!-- Search Bar -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            app:cardCornerRadius="12dp"
+            app:cardCornerRadius="8dp"
             app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="8dp">
 
                 <EditText
                     android:id="@+id/searchBar"
@@ -77,56 +73,19 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="@string/search_hint"
-                    android:textSize="16sp"
+                    android:hint="Search legal aid..."
                     android:padding="8dp"
-                    android:fontFamily="sans-serif"/>
+                    android:textSize="16sp"/>
 
                 <ImageButton
                     android:id="@+id/searchButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_search"
                     android:tint="@color/primary"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-
-        <!-- Add this inside your ScrollView, after the search bar -->
-        <LinearLayout
-            android:id="@+id/noResultsLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="32dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:src="@android:drawable/ic_menu_search"
-                android:tint="@color/text_secondary"
-                android:alpha="0.5"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="No Results Found"
-                android:textColor="@color/text_secondary"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif-medium"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Try different keywords or browse categories below"
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp"
-                android:gravity="center"/>
-        </LinearLayout>
 
         <!-- Main Content -->
         <ScrollView
@@ -141,13 +100,96 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Categories Section -->
+                <!-- Quick Actions -->
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quick Actions"
+                    android:textColor="@color/text_primary"
+                    android:textSize="20sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="16dp"/>
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/categories"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="24dp">
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/newApplicationCard"
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            android:background="?attr/selectableItemBackground">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_new_form"
+                                android:tint="@color/primary"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="New Application"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_primary"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/trackApplicationCard"
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            android:background="?attr/selectableItemBackground">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_track"
+                                android:tint="@color/secondary_orange"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Track Application"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_primary"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <!-- Categories -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Legal Categories"
                     android:textColor="@color/text_primary"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     android:fontFamily="sans-serif-medium"
                     android:layout_marginBottom="16dp"/>
 
@@ -161,162 +203,112 @@
                     <!-- Category Cards -->
                     <androidx.cardview.widget.CardView
                         android:id="@+id/civilCard"
-                        style="@style/AppCard"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
-                        android:layout_margin="8dp">
+                        android:layout_margin="8dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="4dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp"
-                            android:gravity="center">
+                            android:padding="16dp">
 
                             <ImageView
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
-                                android:src="@android:drawable/ic_menu_edit"
+                                android:src="@drawable/ic_civil"
+                                android:tint="@color/primary"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Civil Cases"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/criminalCard"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_criminal"
                                 android:tint="@color/secondary_orange"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="@string/civil_cases"
+                                android:text="Criminal Cases"
                                 android:textColor="@color/text_primary"
-                                android:textSize="16sp"
-                                android:fontFamily="sans-serif-medium"/>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/criminalCard"
-                        style="@style/AppCard"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="8dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-
-                            <ImageView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:src="@android:drawable/ic_menu_edit"
-                                android:tint="@color/secondary_green"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="@string/criminal_cases"
-                                android:textColor="@color/text_primary"
-                                android:textSize="16sp"
-                                android:fontFamily="sans-serif-medium"/>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Quick Actions -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/newApplicationCard"
-                        style="@style/AppCard"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_columnSpan="2"
-                        android:layout_margin="8dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/new_application"
-                                android:textColor="@color/text_primary"
-                                android:textSize="18sp"
-                                android:fontFamily="sans-serif-medium"
-                                android:textStyle="bold"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/voice_input_desc"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="16sp"
-                                android:fontFamily="sans-serif-medium"/>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/trackApplicationCard"
-                        style="@style/AppCard"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_columnSpan="2"
-                        android:layout_margin="8dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/track_application"
-                                android:textColor="@color/text_primary"
-                                android:textSize="18sp"
-                                android:fontFamily="sans-serif-medium"
-                                android:textStyle="bold"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/voice_input_desc"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="16sp"
-                                android:fontFamily="sans-serif-medium"/>
+                                android:textSize="16sp"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
                 </GridLayout>
+
+                <!-- Bhashini Logo at bottom -->
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="32dp"
+                    android:src="@drawable/bha"
+                    android:contentDescription="Bhashini Logo"/>
+
             </LinearLayout>
         </ScrollView>
 
-        <!-- AI Chatbot FAB -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/chatbotFab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="16dp"
-            android:src="@android:drawable/ic_dialog_email"
-            app:backgroundTint="@color/secondary_orange"
-            app:tint="@color/text_white"/>
+        <!-- No Results Layout -->
+        <LinearLayout
+            android:id="@+id/noResultsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@android:drawable/ic_menu_search"
+                android:tint="@color/text_secondary"
+                android:alpha="0.5"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="No Results Found"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Try different search terms"
+                android:textColor="@color/text_secondary"/>
+        </LinearLayout>
 
     </LinearLayout>
-
-    <!-- Add this before the BottomNavigationView -->
-    <ImageView
-        android:id="@+id/digitalIndiaLogo"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/img"
-        android:contentDescription="Digital India Logo"
-        android:layout_gravity="center"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
@@ -328,8 +320,6 @@
         app:itemTextColor="@color/bottom_nav_colors"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

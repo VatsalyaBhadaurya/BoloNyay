@@ -12,13 +12,20 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.view.inputmethod.EditorInfo
 import android.widget.ScrollView
 import android.util.Log
+import android.widget.Spinner
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import com.example.legalapp.utils.SessionManager
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var sessionManager: SessionManager
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         
+        sessionManager = SessionManager(this)
+        setupLanguageSpinner()
         setupClickListeners()
         setupBottomNavigation()
         setupSearch()
@@ -144,6 +151,70 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(this, "Error opening form: ${e.message}", Toast.LENGTH_SHORT).show()
             Log.e("MainActivity", "Error opening form", e)
+        }
+    }
+
+    private fun setupLanguageSpinner() {
+        val spinner = findViewById<Spinner>(R.id.languageSpinner)
+        
+        // Define languages
+        val languages = arrayOf(
+            "English",
+            "हिंदी (Hindi)",
+            "বাংলা (Bengali)",
+            "मराठी (Marathi)",
+            "தமிழ் (Tamil)",
+            "తెలుగు (Telugu)",
+            "ગુજરાતી (Gujarati)",
+            "ಕನ್ನಡ (Kannada)",
+            "മലയാളം (Malayalam)",
+            "ਪੰਜਾਬੀ (Punjabi)"
+        )
+
+        // Create adapter
+        val adapter = ArrayAdapter(this, R.layout.spinner_item, languages)
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
+        
+        // Set adapter
+        spinner.adapter = adapter
+
+        // Set selection based on saved language
+        val savedLanguage = sessionManager.userLanguage
+        val index = languages.indexOfFirst { it.contains(savedLanguage) }
+        if (index != -1) {
+            spinner.setSelection(index)
+        }
+
+        // Handle selection
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedLanguage = languages[position].split(" ")[0]  // Get first part before space
+                sessionManager.userLanguage = selectedLanguage
+                updateUILanguage(selectedLanguage)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun updateUILanguage(language: String) {
+        // Update UI text based on selected language
+        // This is where you would update all text in the UI
+        val searchBar = findViewById<EditText>(R.id.searchBar)
+        when (language) {
+            "हिंदी" -> {
+                searchBar.hint = "कानूनी सहायता खोजें..."
+                // Update other UI elements
+            }
+            "বাংলা" -> {
+                searchBar.hint = "আইনি সহায়তা খুঁজুন..."
+                // Update other UI elements
+            }
+            // Add cases for other languages
+            else -> {
+                searchBar.hint = "Search legal aid..."
+                // Reset to English
+            }
         }
     }
 } 

@@ -7,11 +7,12 @@ class SessionManager(context: Context) {
     private val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     
     companion object {
-        private const val PREF_NAME = "BoloNyayPrefs"
+        private const val PREF_NAME = "LegalAppPrefs"
         private const val KEY_IS_FIRST_TIME = "isFirstTime"
         private const val KEY_USER_LANGUAGE = "userLanguage"
         private const val KEY_IS_LOGGED_IN = "isLoggedIn"
         private const val KEY_USER_NAME = "userName"
+        private const val KEY_LANGUAGE = "user_language"
     }
 
     var isFirstTime: Boolean
@@ -19,8 +20,8 @@ class SessionManager(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_IS_FIRST_TIME, value).apply()
 
     var userLanguage: String
-        get() = prefs.getString(KEY_USER_LANGUAGE, "en") ?: "en"
-        set(value) = prefs.edit().putString(KEY_USER_LANGUAGE, value).apply()
+        get() = prefs.getString(KEY_LANGUAGE, "English") ?: "English"
+        set(value) = prefs.edit().putString(KEY_LANGUAGE, value).apply()
 
     var isLoggedIn: Boolean
         get() = prefs.getBoolean(KEY_IS_LOGGED_IN, false)
