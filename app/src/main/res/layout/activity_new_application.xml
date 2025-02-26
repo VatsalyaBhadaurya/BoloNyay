@@ -16,7 +16,7 @@
             android:id="@+id/toolbarTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Application"
+            android:text="@string/new_application"
             android:textColor="@color/background"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -25,7 +25,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,7 +37,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
 
@@ -49,7 +50,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Voice Input"
+                        android:text="@string/voice_input"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -57,7 +59,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Describe your legal issue in your preferred language"
+                        android:text="@string/voice_input_desc"
                         android:textColor="@color/text_secondary" />
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -65,7 +67,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="16dp"
                         android:src="@android:drawable/ic_btn_speak_now"
                         app:backgroundTint="@color/primary"
                         app:tint="@color/background" />
@@ -75,7 +78,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="8dp"
                         android:text="Tap to start recording"
                         android:textColor="@color/text_secondary" />
                 </LinearLayout>
@@ -85,20 +87,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Applicant Name">
+                android:hint="Applicant Name"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintEnabled="true"
+                app:hintAnimationEnabled="true"
+                app:boxBackgroundMode="outline"
+                android:textColorHint="@color/text_secondary"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nameInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName" />
+                    android:inputType="textPersonName"
+                    android:padding="16dp"
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Case Description">
+                android:hint="Case Description"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintTextAppearance="@style/TextLabel"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/descriptionInput"
@@ -106,28 +122,40 @@
                     android:layout_height="wrap_content"
                     android:gravity="top"
                     android:inputType="textMultiLine"
-                    android:minLines="4" />
+                    android:minLines="4"
+                    android:padding="16dp"
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Relief Sought">
+                android:layout_marginBottom="24dp"
+                android:hint="Relief Sought"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintTextAppearance="@style/TextLabel"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/reliefInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
-                    android:minLines="2" />
+                    android:minLines="2"
+                    android:padding="16dp"
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/submitButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Submit Application" />
+                android:padding="12dp"
+                android:text="@string/submit_application"
+                android:textSize="16sp"
+                app:cornerRadius="8dp" />
 
         </LinearLayout>
     </ScrollView>

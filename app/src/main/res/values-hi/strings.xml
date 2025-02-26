@@ -1,1 +1,9 @@
- 
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">कानूनी आवेदन पोर्टल</string>
+    <string name="search_hint">कानूनी आवेदन खोजें...</string>
+    <string name="new_application">नया आवेदन</string>
+    <string name="track_application">आवेदन ट्रैक करें</string>
+    <string name="civil_cases">सिविल केस</string>
+    <string name="criminal_cases">आपराधिक मामले</string>
+</resources> 

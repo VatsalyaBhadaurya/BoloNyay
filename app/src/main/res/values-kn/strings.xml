@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ಕಾನೂನು ಅರ್ಜಿ ಪೋರ್ಟಲ್</string>
+    <string name="search_hint">ಕಾನೂನು ಅರ್ಜಿಗಳನ್ನು ಹುಡುಕಿ...</string>
+    <string name="new_application">ಹೊಸ ಅರ್ಜಿ</string>
+    <string name="track_application">ಅರ್ಜಿ ಟ್ರ್ಯಾಕ್</string>
+    <string name="civil_cases">ಸಿವಿಲ್ ಪ್ರಕರಣಗಳು</string>
+    <string name="criminal_cases">ಕ್ರಿಮಿನಲ್ ಪ್ರಕರಣಗಳು</string>
+</resources> 

@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Legal Application Portal</string>
+    <string name="search_hint">Search legal applications...</string>
+    <string name="new_application">New Application</string>
+    <string name="track_application">Track Application</string>
+    <string name="civil_cases">Civil Cases</string>
+    <string name="criminal_cases">Criminal Cases</string>
+    <string name="categories">Categories</string>
+    <string name="voice_input">Voice Input</string>
+    <string name="voice_input_desc">Describe your legal issue in your preferred language</string>
+    <string name="submit_application">Submit Application</string>
+    <string name="legal_assistant">Legal Assistant</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_forms">My Forms</string>
+    <string name="menu_profile">Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="logout">Logout</string>
 </resources>

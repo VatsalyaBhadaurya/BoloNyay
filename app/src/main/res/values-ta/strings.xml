@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">சட்ட விண்ணப்ப போர்டல்</string>
+    <string name="search_hint">சட்ட விண்ணப்பங்களைத் தேடுங்கள்...</string>
+    <string name="new_application">புதிய விண்ணப்பம்</string>
+    <string name="track_application">விண்ணப்பத்தை கண்காணி</string>
+    <string name="civil_cases">சிவில் வழக்குகள்</string>
+    <string name="criminal_cases">கிரிமினல் வழக்குகள்</string>
+</resources> 

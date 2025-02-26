@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
+        android:name=".LegalApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -33,7 +34,14 @@
         <activity android:name=".TrackApplicationActivity" />
         <activity android:name=".SearchResultsActivity" />
         <activity android:name=".ChatbotActivity" />
-        
+        <activity
+            android:name=".MyFormsActivity"
+            android:exported="false"
+            android:label="@string/menu_forms" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:label="@string/menu_profile" />
     </application>
 
 </manifest>
