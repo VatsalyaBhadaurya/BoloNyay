@@ -6,27 +6,20 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.legalapp.R
-import com.example.legalapp.models.Form
+import com.example.legalapp.models.SubmittedForm
+import com.google.android.material.button.MaterialButton
 
-class FormsAdapter(private val forms: List<Form>) : 
-    RecyclerView.Adapter<FormsAdapter.FormViewHolder>() {
+class FormsAdapter(
+    private val forms: List<SubmittedForm>,
+    private val onItemClick: (SubmittedForm) -> Unit
+) : RecyclerView.Adapter<FormsAdapter.FormViewHolder>() {
 
-    class FormViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val titleText: TextView = itemView.findViewById(R.id.formTitle)
-        private val typeText: TextView = itemView.findViewById(R.id.formType)
-        private val dateText: TextView = itemView.findViewById(R.id.formDate)
-        private val statusText: TextView = itemView.findViewById(R.id.formStatus)
-
-        fun bind(form: Form) {
-            titleText.text = form.title
-            typeText.text = form.type
-            dateText.text = "Submitted on ${form.submissionDate}"
-            statusText.text = "Status: ${form.status}"
-
-            itemView.setOnClickListener {
-                // Handle click to show form details
-            }
-        }
+    class FormViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val formTypeText: TextView = view.findViewById(R.id.formTypeText)
+        val formTitleText: TextView = view.findViewById(R.id.formTitleText)
+        val submissionDateText: TextView = view.findViewById(R.id.submissionDateText)
+        val statusText: TextView = view.findViewById(R.id.statusText)
+        val trackButton: MaterialButton = view.findViewById(R.id.trackButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FormViewHolder {
@@ -36,7 +29,28 @@ class FormsAdapter(private val forms: List<Form>) :
     }
 
     override fun onBindViewHolder(holder: FormViewHolder, position: Int) {
-        holder.bind(forms[position])
+        val form = forms[position]
+        
+        holder.formTypeText.text = form.type
+        holder.formTitleText.text = form.title
+        holder.submissionDateText.text = form.submissionDate
+        holder.statusText.text = form.status
+
+        holder.trackButton.setOnClickListener {
+            onItemClick(form)
+        }
+
+        // Optional: Change status text color based on status
+        holder.statusText.setTextColor(
+            holder.itemView.context.getColor(
+                when (form.status.lowercase()) {
+                    "pending" -> R.color.warning
+                    "approved" -> R.color.secondary_green
+                    "rejected" -> R.color.error
+                    else -> R.color.secondary_orange
+                }
+            )
+        )
     }
 
     override fun getItemCount() = forms.size

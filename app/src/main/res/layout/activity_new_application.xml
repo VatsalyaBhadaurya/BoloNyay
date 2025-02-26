@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/background">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -17,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/new_application"
-            android:textColor="@color/background"
+            android:textColor="@color/text_white"
             android:textSize="18sp"
             android:textStyle="bold" />
     </androidx.appcompat.widget.Toolbar>
@@ -96,13 +97,29 @@
                 android:textColorHint="@color/text_secondary"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/nameInput"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:padding="16dp"
-                    android:textSize="16sp" />
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/nameInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Full Name"
+                        android:inputType="textPersonName"
+                        android:padding="16dp"
+                        android:textSize="16sp" />
+
+                    <ImageButton
+                        android:id="@+id/nameVoiceButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_mic"
+                        android:tint="@color/primary" />
+                </LinearLayout>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -116,15 +133,30 @@
                 app:hintTextAppearance="@style/TextLabel"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/descriptionInput"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:inputType="textMultiLine"
-                    android:minLines="4"
-                    android:padding="16dp"
-                    android:textSize="16sp" />
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/descriptionInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Description of Issue"
+                        android:inputType="textMultiLine"
+                        android:minLines="3"
+                        android:padding="16dp"
+                        android:textSize="16sp" />
+
+                    <ImageButton
+                        android:id="@+id/descriptionVoiceButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_mic"
+                        android:tint="@color/primary" />
+                </LinearLayout>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -138,24 +170,50 @@
                 app:hintTextAppearance="@style/TextLabel"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/reliefInput"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:minLines="2"
-                    android:padding="16dp"
-                    android:textSize="16sp" />
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/reliefInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Relief Sought"
+                        android:inputType="textMultiLine"
+                        android:minLines="2"
+                        android:padding="16dp"
+                        android:textSize="16sp" />
+
+                    <ImageButton
+                        android:id="@+id/reliefVoiceButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_mic"
+                        android:tint="@color/primary" />
+                </LinearLayout>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/submitButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
                 android:text="@string/submit_application"
-                android:textSize="16sp"
+                android:backgroundTint="@color/secondary_green"
+                android:textColor="@color/text_white"
                 app:cornerRadius="8dp" />
+
+            <ImageView
+                android:id="@+id/digitalIndiaLogo"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/img"
+                android:contentDescription="Digital India Logo"
+                android:layout_gravity="center"/>
 
         </LinearLayout>
     </ScrollView>

@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="80dp"
+    android:viewportWidth="240"
+    android:viewportHeight="80">
+    
+    <!-- Background -->
+    <path
+        android:fillColor="#FF9F1C"
+        android:pathData="M0,0h240v80h-240z"/>
+    
+    <!-- Digital India Text -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,25h160v30h-160z"/>
+    
+    <!-- Lion Capital -->
+    <path
+        android:fillColor="#000080"
+        android:pathData="M20,15h40v50h-40z"/>
+</vector> 

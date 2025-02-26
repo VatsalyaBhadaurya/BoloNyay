@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#0B3D91</color>    <!-- Deep Blue like govt apps -->
-    <color name="secondary">#FF6B35</color>  <!-- Orange accent -->
+    <!-- Primary Colors -->
+    <color name="primary">#2C3E50</color>
+    <color name="primary_dark">#1B2631</color>
+    <color name="primary_light">#3D5166</color>
+
+    <!-- Secondary Colors -->
+    <color name="secondary_orange">#E67E22</color>
+    <color name="secondary_green">#27AE60</color>
+
+    <!-- Background Colors -->
     <color name="background">#FFFFFF</color>
-    <color name="text_primary">#000000</color>
-    <color name="text_secondary">#666666</color>
-    <color name="divider">#EEEEEE</color>
+    <color name="background_light">#F4F4F4</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#34495E</color>
+    <color name="text_secondary">#7F8C8D</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- Accent Colors -->
+    <color name="error">#C0392B</color>
+    <color name="warning">#F1C40F</color>
+
+    <!-- Status Bar and Navigation Colors -->
+    <color name="status_bar">#1B2631</color>
+    <color name="nav_bar">#2C3E50</color>
+
+    <!-- Legacy Colors (Required by Android) -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
 </resources>

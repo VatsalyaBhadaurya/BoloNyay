@@ -4,10 +4,14 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -15,6 +19,7 @@ import androidx.core.content.ContextCompat
 import com.example.legalapp.utils.SessionManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.Locale
 
 class LanguageDetectionActivity : AppCompatActivity() {
 
@@ -23,8 +28,10 @@ class LanguageDetectionActivity : AppCompatActivity() {
     private lateinit var micButton: FloatingActionButton
     private lateinit var statusText: TextView
     private lateinit var continueButton: MaterialButton
+    private lateinit var progressBar: ProgressBar
 
     private val PERMISSION_REQUEST_CODE = 123
+    private var isListening = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +47,14 @@ class LanguageDetectionActivity : AppCompatActivity() {
         micButton = findViewById(R.id.micButton)
         statusText = findViewById(R.id.statusText)
         continueButton = findViewById(R.id.continueButton)
+        progressBar = findViewById(R.id.progressBar)
 
         micButton.setOnClickListener {
-            startVoiceRecognition()
+            if (!isListening) {
+                startVoiceRecognition()
+            } else {
+                stopVoiceRecognition()
+            }
         }
 
         continueButton.setOnClickListener {
@@ -50,87 +62,241 @@ class LanguageDetectionActivity : AppCompatActivity() {
         }
     }
 
+    private fun startVoiceRecognition() {
+        try {
+            isListening = true
+            micButton.setImageResource(android.R.drawable.ic_media_pause)
+            progressBar.visibility = View.VISIBLE
+            statusText.text = getString(R.string.tap_to_speak)
+
+            // Release previous instance
+            if (::speechRecognizer.isInitialized) {
+                speechRecognizer.destroy()
+            }
+
+            // Create new instance
+            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+            setupRecognitionListener()
+
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
+                putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
+                // Support multiple languages
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "hi-IN,ta-IN,te-IN,kn-IN,en-IN")
+                putExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES, arrayListOf("hi-IN", "ta-IN", "te-IN", "kn-IN", "en-IN"))
+            }
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                speechRecognizer.startListening(intent)
+            }, 100)
+
+        } catch (e: Exception) {
+            Log.e("LanguageDetection", "Error: ${e.message}")
+            stopVoiceRecognition()
+            showError("Error starting speech recognition")
+        }
+    }
+
+    private fun setupRecognitionListener() {
+        speechRecognizer.setRecognitionListener(object : RecognitionListener {
+            override fun onReadyForSpeech(params: Bundle?) {
+                runOnUiThread {
+                    statusText.text = "Listening..."
+                    progressBar.visibility = View.VISIBLE
+                    micButton.isEnabled = true
+                }
+            }
+
+            override fun onResults(results: Bundle?) {
+                try {
+                    val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    if (!matches.isNullOrEmpty()) {
+                        val spokenText = matches[0]
+                        Log.d("LanguageDetection", "Received text: $spokenText")
+                        detectLanguage(spokenText)
+                    }
+                } catch (e: Exception) {
+                    Log.e("LanguageDetection", "Error processing results: ${e.message}")
+                    showError("Error processing speech")
+                } finally {
+                    runOnUiThread {
+                        micButton.isEnabled = true
+                        stopVoiceRecognition()
+                    }
+                }
+            }
+
+            override fun onError(error: Int) {
+                val message = when (error) {
+                    SpeechRecognizer.ERROR_NO_MATCH -> {
+                        // Restart recognition if no match found
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            startVoiceRecognition()
+                        }, 100)
+                        "No speech detected, trying again..."
+                    }
+                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Speech timeout"
+                    SpeechRecognizer.ERROR_NETWORK -> "Network error"
+                    SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
+                    SpeechRecognizer.ERROR_CLIENT -> {
+                        // Restart recognition on client error
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            startVoiceRecognition()
+                        }, 100)
+                        "Restarting recognition..."
+                    }
+                    SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Permission needed"
+                    SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> {
+                        stopVoiceRecognition()
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            startVoiceRecognition()
+                        }, 100)
+                        "Service busy, retrying..."
+                    }
+                    else -> "Error occurred. Please try again"
+                }
+                showError(message)
+            }
+
+            override fun onEndOfSpeech() {
+                runOnUiThread {
+                    statusText.text = "Processing..."
+                }
+            }
+
+            override fun onBeginningOfSpeech() {}
+            override fun onRmsChanged(rmsdB: Float) {}
+            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onPartialResults(partialResults: Bundle?) {}
+            override fun onEvent(eventType: Int, params: Bundle?) {}
+        })
+    }
+
+    private fun stopVoiceRecognition() {
+        try {
+            isListening = false
+            runOnUiThread {
+                micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
+                progressBar.visibility = View.GONE
+                micButton.isEnabled = true
+            }
+            if (::speechRecognizer.isInitialized) {
+                speechRecognizer.stopListening()
+                speechRecognizer.cancel()
+            }
+        } catch (e: Exception) {
+            Log.e("LanguageDetection", "Error stopping recognition: ${e.message}")
+        }
+    }
+
+    private fun showError(message: String) {
+        runOnUiThread {
+            statusText.text = message
+            progressBar.visibility = View.GONE
+            micButton.isEnabled = true
+        }
+    }
+
     private fun setupSpeechRecognizer() {
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            showError("Speech recognition not available")
+            return
+        }
+
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         speechRecognizer.setRecognitionListener(object : RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {
-                statusText.text = "Listening..."
-                micButton.isEnabled = false
+                runOnUiThread {
+                    statusText.text = "Listening..."
+                    progressBar.visibility = View.VISIBLE
+                    micButton.isEnabled = false
+                }
             }
 
             override fun onResults(results: Bundle?) {
                 val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 if (!matches.isNullOrEmpty()) {
                     val spokenText = matches[0]
-                    statusText.text = "Processing: $spokenText"
+                    Log.d("LanguageDetection", "Received text: $spokenText")
                     detectLanguage(spokenText)
-                } else {
-                    statusText.text = "Could not detect speech. Please try again."
                 }
-                micButton.isEnabled = true
+                runOnUiThread {
+                    micButton.isEnabled = true
+                    stopVoiceRecognition()
+                }
             }
 
             override fun onError(error: Int) {
-                val errorMessage = when (error) {
-                    SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
-                    SpeechRecognizer.ERROR_CLIENT -> "Client side error"
-                    SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Insufficient permissions"
+                val message = when (error) {
+                    SpeechRecognizer.ERROR_NO_MATCH -> "No speech detected"
+                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Speech timeout"
                     SpeechRecognizer.ERROR_NETWORK -> "Network error"
                     SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
-                    SpeechRecognizer.ERROR_NO_MATCH -> "No speech input"
-                    SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Recognition service busy"
-                    SpeechRecognizer.ERROR_SERVER -> "Server error"
-                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No speech input"
-                    else -> "Error occurred. Try again"
+                    SpeechRecognizer.ERROR_CLIENT -> "Client error"
+                    SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Permission needed"
+                    SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Service is busy"
+                    else -> "Error occurred. Please try again"
                 }
-                statusText.text = errorMessage
-                micButton.isEnabled = true
-            }
-
-            override fun onPartialResults(partialResults: Bundle?) {
-                val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                if (!matches.isNullOrEmpty()) {
-                    statusText.text = "Heard: ${matches[0]}"
+                showError(message)
+                runOnUiThread {
+                    micButton.isEnabled = true
+                    stopVoiceRecognition()
                 }
             }
 
-            // Other required methods...
-            override fun onBeginningOfSpeech() {
-                statusText.text = "Listening..."
+            override fun onEndOfSpeech() {
+                runOnUiThread {
+                    statusText.text = "Processing..."
+                }
             }
+
+            override fun onBeginningOfSpeech() {}
             override fun onRmsChanged(rmsdB: Float) {}
             override fun onBufferReceived(buffer: ByteArray?) {}
-            override fun onEndOfSpeech() {
-                statusText.text = "Processing..."
-            }
+            override fun onPartialResults(partialResults: Bundle?) {}
             override fun onEvent(eventType: Int, params: Bundle?) {}
         })
     }
 
-    private fun startVoiceRecognition() {
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            // Add support for multiple languages
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "hi-IN,ta-IN,te-IN,kn-IN,en-IN")
-            putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, true)
-            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
-        }
-        speechRecognizer.startListening(intent)
-    }
+    private fun detectLanguage(text: String) {
+        Log.d("LanguageDetection", "Detecting language for: $text")
+        
+        // More comprehensive language patterns
+        val hindiPattern = ".*[अ-ह़ऱ-ॿ].*".toRegex()
+        val tamilPattern = ".*[அ-ஔக-சஜ-டண-தந-னப-மய-வஷ-ஹ].*".toRegex()
+        val teluguPattern = ".*[అ-ఌఎ-ఐఒ-నప-ళవ-హ].*".toRegex()
+        val kannadaPattern = ".*[ಅ-ಌಎ-ಐಒ-ನಪ-ಳವ-ಹ].*".toRegex()
 
-    private fun detectLanguage(spokenText: String) {
-        // Improved language detection with more patterns
+        // Common words in each language
+        val hindiWords = listOf("नमस्ते", "धन्यवाद", "हाँ", "नहीं")
+        val tamilWords = listOf("வணக்கம்", "நன்றி", "ஆம்", "இல்லை")
+        val teluguWords = listOf("నమస్కారం", "ధన్యవాదాలు", "అవును", "కాదు")
+        val kannadaWords = listOf("ನಮಸ್ಕಾರ", "ಧನ್ಯವಾದಗಳು", "ಹೌದು", "ಇಲ್ಲ")
+
         val languageCode = when {
-            // Hindi detection
-            spokenText.matches(Regex(".*[अ-ह़].*")) -> "hi"
-            // Tamil detection
-            spokenText.matches(Regex(".*[அ-ஔ].*|.*[க-ன].*")) -> "ta"
-            // Telugu detection
-            spokenText.matches(Regex(".*[అ-ఱ].*|.*[ౠ-ౡ].*")) -> "te"
-            // Kannada detection
-            spokenText.matches(Regex(".*[ಅ-ಹ].*|.*[ೞ].*")) -> "kn"
-            else -> "en"
+            // Check for script patterns
+            hindiPattern.matches(text) || hindiWords.any { text.contains(it, ignoreCase = true) } -> {
+                Log.d("LanguageDetection", "Detected Hindi")
+                "hi"
+            }
+            tamilPattern.matches(text) || tamilWords.any { text.contains(it, ignoreCase = true) } -> {
+                Log.d("LanguageDetection", "Detected Tamil")
+                "ta"
+            }
+            teluguPattern.matches(text) || teluguWords.any { text.contains(it, ignoreCase = true) } -> {
+                Log.d("LanguageDetection", "Detected Telugu")
+                "te"
+            }
+            kannadaPattern.matches(text) || kannadaWords.any { text.contains(it, ignoreCase = true) } -> {
+                Log.d("LanguageDetection", "Detected Kannada")
+                "kn"
+            }
+            else -> {
+                Log.d("LanguageDetection", "Defaulting to English")
+                "en"
+            }
         }
 
         sessionManager.userLanguage = languageCode
@@ -139,14 +305,22 @@ class LanguageDetectionActivity : AppCompatActivity() {
 
     private fun updateUIForDetectedLanguage(languageCode: String) {
         val languageName = when (languageCode) {
-            "hi" -> "Hindi (हिंदी)"
-            "ta" -> "Tamil (தமிழ்)"
-            "te" -> "Telugu (తెలుగు)"
-            "kn" -> "Kannada (ಕನ್ನಡ)"
+            "hi" -> "हिंदी (Hindi)"
+            "ta" -> "தமிழ் (Tamil)"
+            "te" -> "తెలుగు (Telugu)"
+            "kn" -> "ಕನ್ನಡ (Kannada)"
             else -> "English"
         }
-        statusText.text = "Detected language: $languageName"
-        continueButton.visibility = View.VISIBLE
+        
+        runOnUiThread {
+            statusText.text = "Detected language: $languageName"
+            continueButton.apply {
+                visibility = View.VISIBLE
+                setBackgroundColor(getColor(R.color.secondary_green))
+                setTextColor(getColor(R.color.text_white))
+            }
+            micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
+        }
     }
 
     private fun checkPermission() {
@@ -185,6 +359,8 @@ class LanguageDetectionActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        speechRecognizer.destroy()
+        if (::speechRecognizer.isInitialized) {
+            speechRecognizer.destroy()
+        }
     }
 } 

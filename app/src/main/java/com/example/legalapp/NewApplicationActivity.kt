@@ -1,30 +1,34 @@
 package com.example.legalapp
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import com.example.legalapp.utils.SessionManager
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.net.URL
-import javax.net.ssl.HttpsURLConnection
+import java.text.SimpleDateFormat
+import java.util.*
 import android.widget.Toast
-import android.content.Intent
-import android.util.Log
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ProgressBar
 
 class NewApplicationActivity : AppCompatActivity() {
     private lateinit var micButton: FloatingActionButton
@@ -33,19 +37,23 @@ class NewApplicationActivity : AppCompatActivity() {
     private lateinit var descriptionInput: TextInputEditText
     private lateinit var reliefInput: TextInputEditText
     private lateinit var progressBar: View
-    
+    private lateinit var sessionManager: SessionManager
     private lateinit var speechRecognizer: SpeechRecognizer
     private var isRecording = false
+    private var currentEditText: EditText? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         try {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_new_application)
 
+            sessionManager = SessionManager(this)
             setupViews()
             setupSpeechRecognition()
             checkPermissions()
             setupFormBasedOnType()
+            setupVoiceInputButtons()
+            setupSubmitButton()
         } catch (e: Exception) {
             Log.e("NewApplicationActivity", "Error in onCreate: ${e.message}", e)
             Toast.makeText(this, "Error initializing application", Toast.LENGTH_LONG).show()
@@ -69,135 +77,125 @@ class NewApplicationActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Button>(R.id.submitButton).setOnClickListener {
-            submitApplication()
+        findViewById<MaterialButton>(R.id.submitButton).setOnClickListener {
+            if (validateForm()) {
+                submitForm()
+            }
         }
     }
 
     private fun setupSpeechRecognition() {
-        try {
-            if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-                Toast.makeText(this, "Speech recognition is not available on this device", Toast.LENGTH_LONG).show()
-                micButton.isEnabled = false
-                return
-            }
-            
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-            speechRecognizer.setRecognitionListener(object : RecognitionListener {
-                override fun onReadyForSpeech(params: Bundle?) {
-                    isRecording = true
-                    recordingStatus.text = "Listening..."
-                    micButton.setImageResource(android.R.drawable.ic_media_pause)
-                }
-
-                override fun onResults(results: Bundle?) {
-                    val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                    if (!matches.isNullOrEmpty()) {
-                        val spokenText = matches[0]
-                        processVoiceInput(spokenText)
-                    }
-                    stopRecording()
-                }
-
-                // Implement other required methods...
-                override fun onError(error: Int) {
-                    stopRecording()
-                    recordingStatus.text = "Error occurred. Please try again."
-                }
-
-                override fun onBeginningOfSpeech() {}
-                override fun onRmsChanged(rmsdB: Float) {}
-                override fun onBufferReceived(buffer: ByteArray?) {}
-                override fun onEndOfSpeech() {}
-                override fun onPartialResults(partialResults: Bundle?) {}
-                override fun onEvent(eventType: Int, params: Bundle?) {}
-            })
-        } catch (e: Exception) {
-            Log.e("NewApplicationActivity", "Error setting up speech recognition: ${e.message}", e)
-            Toast.makeText(this, "Could not initialize speech recognition", Toast.LENGTH_SHORT).show()
-            micButton.isEnabled = false
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            Toast.makeText(this, "Speech recognition not available", Toast.LENGTH_SHORT).show()
+            return
         }
+
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+        speechRecognizer.setRecognitionListener(object : RecognitionListener {
+            override fun onReadyForSpeech(params: Bundle?) {
+                runOnUiThread {
+                    currentEditText?.hint = "Listening..."
+                    progressBar.visibility = View.VISIBLE
+                }
+            }
+
+            override fun onResults(results: Bundle?) {
+                val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                if (!matches.isNullOrEmpty()) {
+                    val spokenText = matches[0]
+                    runOnUiThread {
+                        currentEditText?.setText(spokenText)
+                    }
+                }
+                stopVoiceRecognition()
+            }
+
+            override fun onError(error: Int) {
+                val message = when (error) {
+                    SpeechRecognizer.ERROR_NO_MATCH -> "No speech detected"
+                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Speech timeout"
+                    SpeechRecognizer.ERROR_NETWORK -> "Network error"
+                    SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
+                    else -> "Error occurred. Please try again"
+                }
+                showError(message)
+                stopVoiceRecognition()
+            }
+
+            // Required overrides
+            override fun onBeginningOfSpeech() {}
+            override fun onRmsChanged(rmsdB: Float) {}
+            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onEndOfSpeech() {}
+            override fun onPartialResults(partialResults: Bundle?) {}
+            override fun onEvent(eventType: Int, params: Bundle?) {}
+        })
     }
 
     private fun startRecording() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak your legal issue...")
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-IN") // For Indian English
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, sessionManager.userLanguage)
         }
         try {
-            speechRecognizer.startListening(intent)
+            isRecording = true
+            micButton.setImageResource(android.R.drawable.ic_media_pause)
+            progressBar.visibility = View.VISIBLE
+            recordingStatus.text = getString(R.string.tap_to_speak)
+
+            lifecycleScope.launch(Dispatchers.Main) {
+                try {
+                    speechRecognizer.startListening(intent)
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@NewApplicationActivity, "Error starting speech recognition", Toast.LENGTH_SHORT).show()
+                        stopRecording()
+                    }
+                }
+            }
         } catch (e: Exception) {
+            Log.e("NewApplicationActivity", "Error in startRecording: ${e.message}")
             Toast.makeText(this, "Error starting speech recognition", Toast.LENGTH_SHORT).show()
+            stopRecording()
         }
     }
 
     private fun stopRecording() {
         isRecording = false
-        speechRecognizer.stopListening()
-        recordingStatus.text = "Tap to start recording"
         micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
+        progressBar.visibility = View.GONE
+        try {
+            speechRecognizer.stopListening()
+        } catch (e: Exception) {
+            Log.e("NewApplicationActivity", "Error stopping recording: ${e.message}")
+        }
     }
 
     private fun processVoiceInput(spokenText: String) {
         progressBar.visibility = View.VISIBLE
         
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // Call BHASHINI API for translation and NLP
-                val bhashiniResponse = callBhashiniApi(spokenText)
-                
-                // Extract information from the processed text
-                val extractedInfo = extractInformation(bhashiniResponse)
+                // Simple text processing
+                val processedText = spokenText.trim()
                 
                 // Update UI on main thread
-                runOnUiThread {
-                    nameInput.setText(extractedInfo.name)
-                    descriptionInput.setText(extractedInfo.description)
-                    reliefInput.setText(extractedInfo.relief)
+                withContext(Dispatchers.Main) {
+                    currentEditText?.setText(processedText)
                     progressBar.visibility = View.GONE
                 }
             } catch (e: Exception) {
-                runOnUiThread {
+                withContext(Dispatchers.Main) {
                     progressBar.visibility = View.GONE
-                    // Show error message
+                    Toast.makeText(
+                        this@NewApplicationActivity,
+                        "Error processing voice input: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
-    }
-
-    private fun callBhashiniApi(text: String): String {
-        // Implementation of BHASHINI API call
-        // This is a placeholder - you'll need to implement the actual API call
-        val url = URL("https://bhashini.gov.in/api/v1/inference/translation")
-        val connection = url.openConnection() as HttpsURLConnection
-        
-        // Add your API configuration here
-        connection.requestMethod = "POST"
-        connection.setRequestProperty("Content-Type", "application/json")
-        connection.setRequestProperty("Authorization", "YOUR_API_KEY")
-        
-        val requestBody = JSONObject().apply {
-            put("input_text", text)
-            put("source_language", "auto")
-            put("target_language", "en")
-        }.toString()
-        
-        // Send request and get response
-        connection.outputStream.write(requestBody.toByteArray())
-        val response = connection.inputStream.bufferedReader().readText()
-        
-        return response
-    }
-
-    private fun extractInformation(apiResponse: String): ApplicationInfo {
-        // Implement NLP to extract relevant information
-        // This is a placeholder - you'll need to implement actual information extraction
-        return ApplicationInfo(
-            name = "Extracted Name",
-            description = "Extracted Description",
-            relief = "Extracted Relief"
-        )
     }
 
     private fun checkPermissions() {
@@ -303,47 +301,131 @@ class NewApplicationActivity : AppCompatActivity() {
         // Add employer details fields
     }
 
-    private fun submitApplication() {
-        val name = nameInput.text.toString()
-        val description = descriptionInput.text.toString()
-        val relief = reliefInput.text.toString()
-        val formType = intent.getStringExtra("form_type") ?: return
+    private fun setupSubmitButton() {
+        findViewById<MaterialButton>(R.id.submitButton).setOnClickListener {
+            if (validateForm()) {
+                submitForm()
+            }
+        }
+    }
 
-        if (name.isEmpty() || description.isEmpty() || relief.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
-            return
+    private fun validateForm(): Boolean {
+        val name = nameInput.text?.toString()?.trim() ?: ""
+        val description = descriptionInput.text?.toString()?.trim() ?: ""
+        val relief = reliefInput.text?.toString()?.trim() ?: ""
+
+        if (name.isEmpty()) {
+            nameInput.error = "Please enter your name"
+            return false
         }
 
-        progressBar.visibility = View.VISIBLE
+        if (description.isEmpty()) {
+            descriptionInput.error = "Please provide case description"
+            return false
+        }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        if (relief.isEmpty()) {
+            reliefInput.error = "Please specify the relief sought"
+            return false
+        }
+
+        return true
+    }
+
+    private fun submitForm() {
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+        progressBar.visibility = View.VISIBLE
+        findViewById<MaterialButton>(R.id.submitButton).isEnabled = false
+
+        // Get form data
+        val formData = hashMapOf(
+            "applicant_name" to nameInput.text.toString().trim(),
+            "description" to descriptionInput.text.toString().trim(),
+            "relief_sought" to reliefInput.text.toString().trim(),
+            "submission_date" to SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()),
+            "status" to "Pending"
+        )
+
+        // Simulate API call with coroutines
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
-                delay(1500) // Simulate network call
+                // Simulate network delay
+                delay(1500)
 
                 withContext(Dispatchers.Main) {
                     progressBar.visibility = View.GONE
-                    Toast.makeText(
-                        this@NewApplicationActivity, 
-                        "$formType submitted successfully", 
-                        Toast.LENGTH_LONG
-                    ).show()
-                    
-                    nameInput.text?.clear()
-                    descriptionInput.text?.clear()
-                    reliefInput.text?.clear()
-                    
-                    finish()
+                    showSuccessDialog()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     progressBar.visibility = View.GONE
+                    findViewById<MaterialButton>(R.id.submitButton).isEnabled = true
                     Toast.makeText(
-                        this@NewApplicationActivity, 
-                        "Error submitting form: ${e.message}", 
+                        this@NewApplicationActivity,
+                        "Error submitting form: ${e.message}",
                         Toast.LENGTH_LONG
                     ).show()
                 }
             }
+        }
+    }
+
+    private fun showSuccessDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Success")
+            .setMessage("Your application has been submitted successfully!")
+            .setPositiveButton("View My Applications") { _, _ ->
+                startActivity(Intent(this, MyFormsActivity::class.java))
+                finish()
+            }
+            .setNegativeButton("Back to Home") { _, _ ->
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun setupVoiceInputButtons() {
+        // Setup voice input for each field
+        setupVoiceInputForField(R.id.nameInput, R.id.nameVoiceButton)
+        setupVoiceInputForField(R.id.descriptionInput, R.id.descriptionVoiceButton)
+        setupVoiceInputForField(R.id.reliefInput, R.id.reliefVoiceButton)
+    }
+
+    private fun setupVoiceInputForField(editTextId: Int, buttonId: Int) {
+        val editText = findViewById<EditText>(editTextId)
+        val voiceButton = findViewById<ImageButton>(buttonId)
+        
+        voiceButton.setOnClickListener {
+            currentEditText = editText
+            startVoiceRecognition()
+        }
+    }
+
+    private fun startVoiceRecognition() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, sessionManager.userLanguage)
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now")
+        }
+        speechRecognizer.startListening(intent)
+    }
+
+    private fun stopVoiceRecognition() {
+        runOnUiThread {
+            progressBar.visibility = View.GONE
+            currentEditText?.hint = currentEditText?.hint?.toString()?.replace("Listening...", "") ?: ""
+        }
+    }
+
+    private fun showError(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            recordingStatus.text = message
+            progressBar.visibility = View.GONE
+            micButton.isEnabled = true
+            currentEditText?.hint = currentEditText?.hint?.toString()?.replace("Listening...", "") ?: ""
         }
     }
 

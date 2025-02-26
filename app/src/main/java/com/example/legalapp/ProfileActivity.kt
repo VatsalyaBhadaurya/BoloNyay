@@ -1,31 +1,63 @@
 package com.example.legalapp
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.TextView
+import android.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.google.android.material.button.MaterialButton
+import com.example.legalapp.utils.SessionManager
 
 class ProfileActivity : AppCompatActivity() {
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        // Get saved user data
-        val prefs = getSharedPreferences("UserProfile", MODE_PRIVATE)
-        val userName = prefs.getString("name", "John Doe")
-        val userEmail = prefs.getString("email", "john.doe@example.com")
-        val userPhone = prefs.getString("phone", "+91 9876543210")
+        sessionManager = SessionManager(this)
 
-        // Set user data to views
-        findViewById<TextView>(R.id.userName).text = userName
-        findViewById<TextView>(R.id.userEmail).text = userEmail
-        findViewById<TextView>(R.id.userPhone).text = userPhone
+        // Set up initial user data
+        if (!sessionManager.isLoggedIn) {
+            sessionManager.setUserLoggedIn("Vatsalya Bhadaurya")
+        }
+
+        setupViews()
+    }
+
+    private fun setupViews() {
+        // Setup toolbar
+        findViewById<Toolbar>(R.id.toolbar).setNavigationOnClickListener {
+            onBackPressed()
+        }
+
+        // Set user name
+        findViewById<TextView>(R.id.userNameText).text = sessionManager.userName
 
         // Setup logout button
         findViewById<MaterialButton>(R.id.logoutButton).setOnClickListener {
-            // Handle logout
-            // Clear preferences, go to login screen, etc.
+            showLogoutConfirmationDialog()
         }
+    }
+
+    private fun showLogoutConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Logout")
+            .setMessage("Are you sure you want to logout?")
+            .setPositiveButton("Yes") { _, _ ->
+                performLogout()
+            }
+            .setNegativeButton("No", null)
+            .show()
+    }
+
+    private fun performLogout() {
+        sessionManager.logout()
+        // Navigate to MainActivity and clear the back stack
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
+        finish()
     }
 } 

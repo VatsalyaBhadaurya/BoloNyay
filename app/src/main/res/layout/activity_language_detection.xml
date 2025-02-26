@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     android:padding="16dp">
 
     <TextView
@@ -12,7 +13,7 @@
         android:layout_marginTop="64dp"
         android:text="@string/welcome_message"
         android:textAlignment="center"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/primary"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,11 +35,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
         android:src="@android:drawable/ic_btn_speak_now"
-        app:backgroundTint="@color/primary"
+        app:backgroundTint="@color/secondary_orange"
+        app:tint="@color/text_white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/instructionText"
-        app:tint="@color/background" />
+        app:layout_constraintTop_toBottomOf="@id/instructionText" />
 
     <TextView
         android:id="@+id/statusText"
@@ -51,13 +52,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/micButton" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        android:indeterminateTint="@color/secondary_orange"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/micButton" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/continueButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:text="@string/continue_button"
+        android:textColor="@color/text_white"
+        android:backgroundTint="@color/secondary_green"
         android:visibility="gone"
+        app:cornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/img"
+        android:contentDescription="Digital India Logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout> 

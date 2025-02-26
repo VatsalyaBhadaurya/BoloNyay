@@ -143,14 +143,7 @@ class MainActivity : AppCompatActivity() {
                 val searchBar = findViewById<EditText>(R.id.searchBar)
                 val query = searchBar.text.toString()
                 if (query.isNotEmpty()) {
-                    try {
-                        val intent = Intent(this@MainActivity, SearchResultsActivity::class.java)
-                        intent.putExtra("query", query)
-                        startActivity(intent)
-                    } catch (e: Exception) {
-                        Log.e("MainActivity", "Error starting SearchResultsActivity: ${e.message}")
-                        Toast.makeText(this@MainActivity, "Error performing search", Toast.LENGTH_SHORT).show()
-                    }
+                    handleSearch(query)
                 }
             }
         }
@@ -170,6 +163,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun handleSearch(query: String) {
+        startActivity(Intent(this, SearchResultsActivity::class.java).apply {
+            putExtra("search_query", query)
+        })
+    }
+
     private fun setupSearch() {
         val searchButton = findViewById<ImageButton>(R.id.searchButton)
         val searchBar = findViewById<EditText>(R.id.searchBar)
@@ -177,9 +176,7 @@ class MainActivity : AppCompatActivity() {
         searchButton.setOnClickListener {
             val query = searchBar.text.toString()
             if (query.isNotEmpty()) {
-                val intent = Intent(this, SearchResultsActivity::class.java)
-                intent.putExtra("query", query)
-                startActivity(intent)
+                handleSearch(query)
             }
         }
     }
