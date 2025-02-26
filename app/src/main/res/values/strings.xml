@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Legal Application Portal</string>
+    <string name="app_name">BoloNyay</string>
     <string name="search_hint">Search legal applications...</string>
     <string name="new_application">New Application</string>
     <string name="track_application">Track Application</string>
@@ -16,4 +16,8 @@
     <string name="menu_profile">Profile</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="logout">Logout</string>
+    <string name="welcome_message">Welcome to BoloNyay</string>
+    <string name="language_detection_instruction">Please speak something in your preferred language</string>
+    <string name="tap_to_speak">Tap microphone to start speaking</string>
+    <string name="continue_button">Continue</string>
 </resources>

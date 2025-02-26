@@ -17,11 +17,20 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.example.legalapp.utils.LocaleHelper
 import java.util.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.legalapp.utils.SessionManager
 
 class MainActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        val sessionManager = SessionManager(this)
+        if (sessionManager.isFirstTime) {
+            startActivity(Intent(this, LanguageDetectionActivity::class.java))
+            finish()
+            return
+        }
+        
         setContentView(R.layout.activity_main)
         
         setupLanguageSpinner()

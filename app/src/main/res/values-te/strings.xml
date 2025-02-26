@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">లీగల్ అప్లికేషన్ పోర్టల్</string>
+    <string name="app_name">బోలో న్యాయ్</string>
     <string name="search_hint">లీగల్ అప్లికేషన్లను శోధించండి...</string>
     <string name="new_application">కొత్త అప్లికేషన్</string>
     <string name="track_application">అప్లికేషన్ ట్రాక్</string>
     <string name="civil_cases">సివిల్ కేసులు</string>
     <string name="criminal_cases">క్రిమినల్ కేసులు</string>
+    <string name="welcome_message">బోలో న్యాయ్ కి స్వాగతం</string>
 </resources> 
